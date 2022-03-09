@@ -37,8 +37,8 @@ const normalizeResult = (params, options) => {
       try {
         let result_ = await parseXML2JSON(data);
         const allPhotos = result_.rsp.photos[0].photo.map(({ "$": info }) => {
-          let data = { ...info, url: getSingleImagesUrl(info, options?.size) };
-          return data;
+          // let data = { ...info, url: getSingleImagesUrl(info, options?.size) };
+          return info;
         });
         const photoInfo = result_.rsp.photos[0].$;
         let result = { data: allPhotos, ...photoInfo };
@@ -75,62 +75,11 @@ const fetchImages = () => {
       params: {
         per_page: 50,
         method: "flickr.photos.getRecent",
-        api_key: "dfcb71b020c43fc837d4f01f8e5fac7d"
+        api_key: "dfcb71b020c43fc837d4f01f8e5fac7d",
+        extras: "title, tags, description, url_w, url_o"
       }
     },
     { manual: true }
   );
 };
 export { fetchImages, getSingleImagesUrl };
-
-let z = {
-  "rsp": {
-    "$": { "stat": "ok" },
-    "photos": [
-      {
-        "$": { "page": "1", "pages": "334", "perpage": "3", "total": "1000" },
-        "photo": [
-          {
-            "$": {
-              "id": "51927168707",
-              "owner": "192430235@N04",
-              "secret": "acf54eca50",
-              "server": "65535",
-              "farm": "66",
-              "title": "20220309_090723",
-              "ispublic": "1",
-              "isfriend": "0",
-              "isfamily": "0"
-            }
-          },
-          {
-            "$": {
-              "id": "51928143031",
-              "owner": "40498517@N04",
-              "secret": "fc48abf8c9",
-              "server": "65535",
-              "farm": "66",
-              "title": "Sloop Institute 2022-167.jpg",
-              "ispublic": "1",
-              "isfriend": "0",
-              "isfamily": "0"
-            }
-          },
-          {
-            "$": {
-              "id": "51928485114",
-              "owner": "192326824@N02",
-              "secret": "9e1c5b0748",
-              "server": "65535",
-              "farm": "66",
-              "title": "6228c6b725c7f.jpg",
-              "ispublic": "1",
-              "isfriend": "0",
-              "isfamily": "0"
-            }
-          }
-        ]
-      }
-    ]
-  }
-};
