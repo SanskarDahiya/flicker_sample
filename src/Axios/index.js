@@ -67,16 +67,18 @@ const getSingleImagesUrl = (imageData, size) => {
   return `https://live.staticflickr.com/${server}/${id}_${secret}_${size}.jpg`;
 };
 
-const fetchImages = () => {
+const fetchImages = ({ page = 1 } = {}) => {
   return useAxios(
     {
       url: "/",
       method: "POST",
       params: {
-        per_page: 50,
+        per_page: 1000,
+        page,
         method: "flickr.photos.getRecent",
         api_key: "dfcb71b020c43fc837d4f01f8e5fac7d",
-        extras: "title, tags, description, url_w, url_o"
+        extras: "title, tags, description, url_w, url_o",
+        safe_search: 3
       }
     },
     { manual: true }

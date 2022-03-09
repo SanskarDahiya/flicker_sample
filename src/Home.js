@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, ScrollView, Dimensions, Pressable } from "react-native";
-const width = Dimensions.get("window").width;
+import { View, Text, Image, FlatList, Pressable } from "react-native";
 import { fetchImages } from "./Axios";
 
 function Home(props) {
-  const [{ data: putData, loading, error }, getImages] = fetchImages();
+  const [{ data: imageResult, loading, error }, getImages] = fetchImages();
   useEffect(() => {
-    console.log("🚀 ~ file: Home.js ~ line 8 ~ useEffect ~ executePut");
     getImages();
   }, []);
   let component = <Text>Loading</Text>;
@@ -14,41 +12,66 @@ function Home(props) {
     if (error) {
       component = <Text>Failed</Text>;
     } else {
-      if (putData && putData.data && Array.isArray(putData.data)) {
-        component = putData.data.map(imageData => {
-          const { id, url_w } = imageData;
-          const height = 100;
-          const width = 100;
+      if (imageResult && imageResult.data && Array.isArray(imageResult.data)) {
+        const renderData = ({ item: imageData }) => {
+          const { id, title, url_w } = imageData;
+          const height = 180;
+          const width = 180;
+          const max_length = title.length;
           return (
-            <View key={id} style={{ height, width, margin: 5 }}>
+            <View key={id} style={{ height, width, margin: 5, position: "relative" }}>
               <Pressable
                 onPress={() => {
                   props.navigation.navigate("Image", { data: imageData });
                 }}
               >
                 <Image source={{ uri: url_w }} style={{ height, width }} />
+                <View
+                  style={{
+                    position: "absolute",
+                    backgroundColor: "rgba(0,0,0,0.3)",
+                    bottom: 0,
+                    left: 0
+                  }}
+                >
+                  <Text style={{ color: "white", fontWeight: "400" }}>{title}</Text>
+                </View>
               </Pressable>
             </View>
           );
-        });
-        // console.log("🚀 ~ file: Home.js ~ line 25 ~ component=putData.data.map ~ putData.data", putData.data);
+        };
+        component = (
+          <FlatList
+            style={{ flex: 1 }}
+            contentContainerStyle={{
+              justifyContent: "space-evenly",
+              alignItems: "center"
+            }}
+            numColumns={2}
+            data={imageResult.data}
+            renderItem={renderData}
+            keyExtractor={(item, index) => index.toString()}
+            onEndReached={() => {
+              page = Number(imageResult.page) + 1;
+              getImages({});
+            }}
+          />
+        );
       }
     }
   }
   return (
-    <ScrollView>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "space-evenly",
-          alignItems: "center",
-          flexWrap: "wrap",
-          flexDirection: "row"
-        }}
-      >
-        {component}
-      </View>
-    </ScrollView>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "space-evenly",
+        alignItems: "center",
+        flexWrap: "wrap",
+        flexDirection: "row"
+      }}
+    >
+      {component}
+    </View>
   );
 }
 
